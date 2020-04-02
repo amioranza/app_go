@@ -1,0 +1,108 @@
+kind: pipeline
+name: hello-world
+type: kubernetes
+trigger:
+  branch:
+    - master
+    
+steps:
+  - name: build
+    image: golang
+    commands:
+      - go build
+    when:
+      branch:
+      - master
+  - name: test
+    image: golang
+    commands:
+      - go test
+    when:
+      branch:
+      - master
+  - name: code-analysis
+    image: aosapps/drone-sonar-plugin
+    settings:
+      sonar_host:
+        from_secret: sonar_host
+      sonar_token:
+        from_secret: sonar_token
+  - name: build image
+    image: plugins/docker
+    settings:
+      username:
+        from_secret: docker_username
+      password:
+        from_secret: docker_password
+      repo: amioranza/go-hello-world
+      tags:
+        - latest
+        - '1.0.1'
+        - '1.0'
+        - '1'
+  - name: prepare deploy to dev
+    image: busybox
+    commands:
+      - sed 's/__NAMESPACE__/dev/' k8s/service.yml > k8s/service-dev.yml
+      - sed 's/__NAMESPACE__/dev/' k8s/deployment.yml > k8s/deployment-dev.yml
+  - name: deploy to dev
+    image: sinlead/drone-kubectl
+    settings:
+      kubernetes_server:
+        from_secret: kubernetes_server
+      kubernetes_cert:
+        from_secret: kubernetes_cert
+      kubernetes_token:
+        from_secret: kubernetes_token
+    commands:
+      - kubectl apply -f k8s/service-dev.yml
+      - kubectl apply -f k8s/deployment-dev.yml
+  - name: validate dev
+    image: alpine
+    commands:
+      - apk add --no-cache curl
+      - curl -kvL http://hello-world.dev:8080
+  - name: prepare deploy to uat
+    image: busybox
+    commands:
+      - sed 's/__NAMESPACE__/uat/' k8s/service.yml > k8s/service-uat.yml
+      - sed 's/__NAMESPACE__/uat/' k8s/deployment.yml > k8s/deployment-uat.yml
+  - name: deploy to uat
+    image: sinlead/drone-kubectl
+    settings:
+      kubernetes_server:
+        from_secret: kubernetes_server
+      kubernetes_cert:
+        from_secret: kubernetes_cert
+      kubernetes_token:
+        from_secret: kubernetes_token
+    commands:
+      - kubectl apply -f k8s/service-uat.yml
+      - kubectl apply -f k8s/deployment-uat.yml
+  - name: validate uat
+    image: alpine
+    commands:
+      - apk add --no-cache curl
+      - curl -kvL http://hello-world.uat:8080
+  - name: prepare deploy to prod
+    image: busybox
+    commands:
+      - sed 's/__NAMESPACE__/prod/' k8s/service.yml > k8s/service-prod.yml
+      - sed 's/__NAMESPACE__/prod/' k8s/deployment.yml > k8s/deployment-prod.yml
+  - name: deploy to prod
+    image: sinlead/drone-kubectl
+    settings:
+      kubernetes_server:
+        from_secret: kubernetes_server
+      kubernetes_cert:
+        from_secret: kubernetes_cert
+      kubernetes_token:
+        from_secret: kubernetes_token
+    commands:
+      - kubectl apply -f k8s/service-prod.yml
+      - kubectl apply -f k8s/deployment-prod.yml
+  - name: validate prod
+    image: alpine
+    commands:
+      - apk add --no-cache curl
+      - curl -kvL http://hello-world.prod:8080
