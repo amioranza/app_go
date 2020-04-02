@@ -15,4 +15,4 @@ Gitea - git repository
 
 DroneCI - ci/cd tool
 
-Kubernetes - container orchestration
+Kubernetes - container orchestration.
