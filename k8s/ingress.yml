@@ -1,0 +1,16 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  labels:
+    app: hello-world
+  name: hello-world
+  namespace: dev
+spec:
+  rules:
+    - host: hello.192.168.64.3.xip.io
+      http:
+        paths:
+          - backend:
+              serviceName: hello-world
+              servicePort: 8080
+            path: /
