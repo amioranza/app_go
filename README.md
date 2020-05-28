@@ -1,6 +1,6 @@
 # app
 
-[![Build Status](http://drone.mdcnet.int/api/badges/amioranza/go-hello-world/status.svg)](http://drone.mdcnet.int/amioranza/go-hello-world)
+[![Build Status](http://jenkins.mdcnet.int/buildStatus/icon?job=amioranza%2Fapp_go%2Fmaster)](http://jenkins.mdcnet.int/job/amioranza/job/app_go/job/master/)
 [![Quality Gate Status](http://sonar.mdcnet.int/api/project_badges/measure?project=amioranza%3Ago-hello-world&metric=alert_status)](http://sonar.mdcnet.int/dashboard?id=amioranza%3Ago-hello-world)
 
 ## CI/CD
