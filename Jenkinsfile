@@ -31,7 +31,7 @@ spec:
     }
 
     environment {
-        registry = "registry.setrem.mdcnet.ninja/root/app"
+        registry = "amioranza/go-app-go"
         GOCACHE = "/tmp"
     }
 
