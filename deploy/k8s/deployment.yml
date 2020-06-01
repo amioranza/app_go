@@ -9,10 +9,14 @@ spec:
   selector:
     matchLabels:
       role: app
+      app: hello-go
+      version: v1
   template:
     metadata:
       labels:
         role: app
+        app: hello-go
+        version: v1
     spec:
       containers:
       - name: app
