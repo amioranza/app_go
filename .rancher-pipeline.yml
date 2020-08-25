@@ -1,0 +1,31 @@
+stages:
+- name: build
+  steps:
+  - runScriptConfig:
+      image: golang:latest
+      shellScript: go build
+- name: test
+  steps:
+  - runScriptConfig:
+      image: golang:latest
+      shellScript: go test
+- name: build-image
+  steps:
+  - publishImageConfig:
+      dockerfilePath: ./Dockerfile
+      buildContext: .
+      tag: amioranza/go-app-go
+      pushRemote: true
+      registry: index.docker.io
+- name: deploy
+  steps:
+  - applyYamlConfig:
+      path: ./deploy/k8s/deployment.yml
+    env:
+      image_id: pipe1
+  - applyYamlConfig:
+      path: ./deploy/k8s/service.yml
+  - applyYamlConfig:
+      path: ./deploy/k8s/ingress.yml
+timeout: 60
+notification: {}
